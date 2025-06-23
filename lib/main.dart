@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mobile_edu/auth/register_page.dart';
-import 'package:mobile_edu/screens/welcome/welcome_screen.dart';
-import 'package:mobile_edu/splash/splash_screen.dart';
+import 'package:mobile_edu/screens/splash/splash_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'auth/login_page.dart';
 import 'screens/siswa/home_siswa.dart';
-import 'screens/home_pengajar.dart';
-import 'screens/home_admin.dart';
+import 'screens/pengajar/home_pengajar.dart';
+import 'screens/admin/home_admin.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

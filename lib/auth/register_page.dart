@@ -30,7 +30,7 @@ class _RegisterPageState extends State<RegisterPage> {
         password.isEmpty ||
         username.isEmpty ||
         fullName.isEmpty) {
-      _showError('Email, password, username, and full name must not be empty.');
+      _showError('Email, password, username, and full name must not be empty');
       return;
     }
 
@@ -44,7 +44,7 @@ class _RegisterPageState extends State<RegisterPage> {
               .maybeSingle();
 
       if (existing != null) {
-        _showError('Username already taken. Please choose another one.');
+        _showError('Username already taken. Please choose another one');
         setState(() => _isLoading = false);
         return;
       }

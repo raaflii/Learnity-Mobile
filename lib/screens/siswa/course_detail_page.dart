@@ -1,9 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:lucide_icons/lucide_icons.dart';
 import 'package:mobile_edu/screens/siswa/reviews_tab.dart';
-import 'package:mobile_edu/widgets/video_player_widget.dart';
+import 'package:mobile_edu/screens/siswa/video_player_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -23,7 +22,9 @@ class _CourseDetailPageState extends State<CourseDetailPage>
   bool _isLoadingTopics = true;
   String? _errorMessage;
   late TabController _tabController;
+  // ignore: unused_field
   String? _username;
+  // ignore: unused_field
   late dynamic _course;
   Map<String, dynamic> _instructor = {};
   List<Map<String, dynamic>> _reviews = [];

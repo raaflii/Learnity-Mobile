@@ -17,7 +17,6 @@ class _AllCourseTabState extends State<AllCourseTab>
   final SupabaseClient client = Supabase.instance.client;
   String _searchQuery = '';
   String? _selectedCategory;
-  bool _isFirstBuild = true;
   String _sortBy = 'newest';
   bool _isGridView = false;
   late Future<List<dynamic>> _categoriesFuture;

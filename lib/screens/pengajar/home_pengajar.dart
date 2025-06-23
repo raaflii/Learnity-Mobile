@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
-import 'package:mobile_edu/auth/login_page.dart';
 import 'package:mobile_edu/screens/pengajar/dashboard.dart';
 import 'package:mobile_edu/screens/pengajar/profile_tab.dart';
-import 'package:mobile_edu/screens/topic_list_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'course_form_page.dart';
 
 class HomePengajar extends StatefulWidget {
   final int initialIndex;

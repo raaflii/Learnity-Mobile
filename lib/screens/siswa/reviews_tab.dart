@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_edu/screens/siswa/providers/review_provider.dart';
 import 'package:mobile_edu/screens/siswa/review_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class ReviewsTab extends ConsumerStatefulWidget {
   final String courseId;

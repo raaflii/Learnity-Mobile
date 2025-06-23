@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_edu/screens/siswa/course_detail_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -585,7 +586,7 @@ class _MyCourseTabState extends State<MyCourseTab>
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          'Rp ${course['price'] ?? '0'}',
+                          'Rp ${_formatPrice(course['price'] ?? '0')}',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
@@ -710,7 +711,7 @@ class _MyCourseTabState extends State<MyCourseTab>
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Rp ${course['price'] ?? '0'}',
+                  'Rp ${_formatPrice(course['price'] ?? '0')}',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
@@ -758,4 +759,16 @@ class _MyCourseTabState extends State<MyCourseTab>
       ],
     );
   }
+}
+
+String _formatPrice(dynamic price) {
+  if (price == null) return '0,00';
+
+  final formatter = NumberFormat.currency(
+    locale: 'id_ID',
+    symbol: '', // Tidak pakai Rp di sini, bisa kamu tambahkan di UI kalau perlu
+    decimalDigits: 2,
+  );
+
+  return formatter.format(price).trim();
 }

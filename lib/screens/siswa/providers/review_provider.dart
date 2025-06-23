@@ -7,17 +7,6 @@ final totalReviewProvider = Provider<int>((ref) {
   return ref.watch(reviewListProvider).length;
 });
 
-// final averageRatingProvider = Provider<double>((ref) {
-//   final reviews = ref.watch(reviewListProvider);
-//   if (reviews.isEmpty) return 0.0;
-
-//   final total = reviews.fold<double>(
-//     0.0,
-//     (sum, r) => sum + ((r['rating'] ?? 0).toDouble()),
-//   );
-//   return total / reviews.length;
-// });
-
 final averageRatingProvider = FutureProvider.family<double, String>((ref, courseId) async {
   final response = await Supabase.instance.client
       .from('review')

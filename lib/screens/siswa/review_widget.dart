@@ -8,11 +8,11 @@ class ReviewForm extends StatefulWidget {
   final VoidCallback onSubmitted;
 
   const ReviewForm({
-    Key? key,
+    super.key,
     required this.courseId,
     required this.userId,
     required this.onSubmitted,
-  }) : super(key: key);
+  });
 
   @override
   State<ReviewForm> createState() => _ReviewFormState();
