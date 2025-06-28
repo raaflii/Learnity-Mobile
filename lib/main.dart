@@ -6,13 +6,14 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'screens/siswa/home_siswa.dart';
 import 'screens/pengajar/home_pengajar.dart';
 import 'screens/admin/home_admin.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load();
   await Supabase.initialize(
-    url: 'https://ksoxroijcvsslxlyygmv.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imtzb3hyb2lqY3Zzc2x4bHl5Z212Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTAxNzIyOTIsImV4cCI6MjA2NTc0ODI5Mn0.Pr2PVLVH-CGQtHybCsHoYtSKAXr60NDu7f8neC_eoq0',
+    url: dotenv.env['SUPABASE_URL']!,
+    anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
   runApp(const ProviderScope(child: MyApp()));
 }
