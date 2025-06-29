@@ -50,6 +50,8 @@ class _CoursesTabAdminState extends State<CoursesTabAdmin>
 
   Future<void> deleteCourse(String id) async {
     try {
+      await supa.from('topic').delete().eq('course_id', id);
+      await supa.from('enrollment').delete().eq('course_id', id);
       await supa.from('course').delete().eq('id', id);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -92,13 +94,13 @@ class _CoursesTabAdminState extends State<CoursesTabAdmin>
   // Updated method to format price with ,00
   String _formatPrice(dynamic price) {
     if (price == null) return 'Free';
-    
+
     final formatter = NumberFormat.currency(
       locale: 'id_ID',
       symbol: 'Rp ',
       decimalDigits: 2, // Show ,00 for Indonesian format
     );
-    
+
     return formatter.format(price);
   }
 
@@ -126,9 +128,9 @@ class _CoursesTabAdminState extends State<CoursesTabAdmin>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                            const Color(0xFF7475d6),
-                            const Color.fromARGB(255, 161, 161, 212),
-                          ]
+                      const Color(0xFF7475d6),
+                      const Color.fromARGB(255, 161, 161, 212),
+                    ],
                   ),
                 ),
                 child: Stack(
@@ -232,7 +234,9 @@ class _CoursesTabAdminState extends State<CoursesTabAdmin>
                       style: TextStyle(color: colorScheme.onSurface),
                       decoration: InputDecoration(
                         hintText: 'Search courses...',
-                        hintStyle: TextStyle(color: theme.textTheme.bodyMedium?.color),
+                        hintStyle: TextStyle(
+                          color: theme.textTheme.bodyMedium?.color,
+                        ),
                         prefixIcon: Icon(
                           Icons.search,
                           color: theme.textTheme.bodyMedium?.color,
@@ -293,7 +297,10 @@ class _CoursesTabAdminState extends State<CoursesTabAdmin>
                               },
                               icon: Icon(
                                 Icons.view_list,
-                                color: !_isGridView ? colorScheme.primary : theme.textTheme.bodyMedium?.color,
+                                color:
+                                    !_isGridView
+                                        ? colorScheme.primary
+                                        : theme.textTheme.bodyMedium?.color,
                               ),
                             ),
                             IconButton(
@@ -304,7 +311,10 @@ class _CoursesTabAdminState extends State<CoursesTabAdmin>
                               },
                               icon: Icon(
                                 Icons.grid_view,
-                                color: _isGridView ? colorScheme.primary : theme.textTheme.bodyMedium?.color,
+                                color:
+                                    _isGridView
+                                        ? colorScheme.primary
+                                        : theme.textTheme.bodyMedium?.color,
                               ),
                             ),
                           ],
@@ -324,7 +334,9 @@ class _CoursesTabAdminState extends State<CoursesTabAdmin>
                   return SizedBox(
                     height: 300,
                     child: Center(
-                      child: CircularProgressIndicator(color: colorScheme.primary),
+                      child: CircularProgressIndicator(
+                        color: colorScheme.primary,
+                      ),
                     ),
                   );
                 }
@@ -333,7 +345,8 @@ class _CoursesTabAdminState extends State<CoursesTabAdmin>
                     height: 300,
                     margin: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: isDark ? Colors.red.withOpacity(0.1) : Colors.red[50],
+                      color:
+                          isDark ? Colors.red.withOpacity(0.1) : Colors.red[50],
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Center(
@@ -403,9 +416,10 @@ class _CoursesTabAdminState extends State<CoursesTabAdmin>
 
                 return FadeTransition(
                   opacity: _fadeAnimation,
-                  child: _isGridView
-                      ? _buildGridView(filteredCourses)
-                      : _buildListView(filteredCourses),
+                  child:
+                      _isGridView
+                          ? _buildGridView(filteredCourses)
+                          : _buildListView(filteredCourses),
                 );
               },
             ),
@@ -443,9 +457,10 @@ class _CoursesTabAdminState extends State<CoursesTabAdmin>
               height: 120,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: isDark
-                      ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
-                      : [colorScheme.primary, const Color(0xFF4a5394)],
+                  colors:
+                      isDark
+                          ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                          : [colorScheme.primary, const Color(0xFF4a5394)],
                 ),
                 borderRadius: BorderRadius.circular(60),
               ),
@@ -467,7 +482,10 @@ class _CoursesTabAdminState extends State<CoursesTabAdmin>
             const SizedBox(height: 8),
             Text(
               'No courses available yet.\nCreate the first one!',
-              style: TextStyle(fontSize: 16, color: theme.textTheme.bodyMedium?.color),
+              style: TextStyle(
+                fontSize: 16,
+                color: theme.textTheme.bodyMedium?.color,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -573,43 +591,54 @@ class _CoursesTabAdminState extends State<CoursesTabAdmin>
           // Course Thumbnail
           ClipRRect(
             borderRadius: BorderRadius.circular(15),
-            child: course['thumbnail_url'] != null &&
-                    course['thumbnail_url'].toString().isNotEmpty
-                ? Image.network(
-                    course['thumbnail_url'],
-                    height: 80,
-                    width: 120,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
+            child:
+                course['thumbnail_url'] != null &&
+                        course['thumbnail_url'].toString().isNotEmpty
+                    ? Image.network(
+                      course['thumbnail_url'],
+                      height: 80,
+                      width: 120,
+                      fit: BoxFit.cover,
+                      errorBuilder:
+                          (context, error, stackTrace) => Container(
+                            height: 80,
+                            width: 120,
+                            decoration: BoxDecoration(
+                              color:
+                                  isDark ? Colors.grey[800] : Colors.grey[200],
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                            child: Icon(
+                              Icons.broken_image,
+                              color:
+                                  isDark ? Colors.grey[600] : Colors.grey[400],
+                            ),
+                          ),
+                    )
+                    : Container(
                       height: 80,
                       width: 120,
                       decoration: BoxDecoration(
-                        color: isDark ? Colors.grey[800] : Colors.grey[200],
+                        gradient: LinearGradient(
+                          colors:
+                              isDark
+                                  ? [
+                                    const Color(0xFF2D3748),
+                                    const Color(0xFF4A5568),
+                                  ]
+                                  : [
+                                    colorScheme.primary,
+                                    const Color(0xFF4a5394),
+                                  ],
+                        ),
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: Icon(
-                        Icons.broken_image,
-                        color: isDark ? Colors.grey[600] : Colors.grey[400],
+                      child: const Icon(
+                        Icons.school,
+                        color: Colors.white,
+                        size: 40,
                       ),
                     ),
-                  )
-                : Container(
-                    height: 80,
-                    width: 120,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: isDark
-                            ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
-                            : [colorScheme.primary, const Color(0xFF4a5394)],
-                      ),
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    child: const Icon(
-                      Icons.school,
-                      color: Colors.white,
-                      size: 40,
-                    ),
-                  ),
           ),
           const SizedBox(width: 16),
 
@@ -688,31 +717,36 @@ class _CoursesTabAdminState extends State<CoursesTabAdmin>
                   break;
               }
             },
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'edit',
-                child: ListTile(
-                  leading: Icon(Icons.edit, color: Colors.blue),
-                  title: Text('Edit Course'),
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'delete',
-                child: ListTile(
-                  leading: Icon(Icons.delete, color: Colors.red),
-                  title: Text('Delete Course'),
-                  contentPadding: EdgeInsets.zero,
-                ),
-              ),
-            ],
+            itemBuilder:
+                (context) => [
+                  const PopupMenuItem(
+                    value: 'edit',
+                    child: ListTile(
+                      leading: Icon(Icons.edit, color: Colors.blue),
+                      title: Text('Edit Course'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'delete',
+                    child: ListTile(
+                      leading: Icon(Icons.delete, color: Colors.red),
+                      title: Text('Delete Course'),
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                ],
             child: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: colorScheme.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.more_vert, color: colorScheme.primary, size: 20),
+              child: Icon(
+                Icons.more_vert,
+                color: colorScheme.primary,
+                size: 20,
+              ),
             ),
           ),
         ],
@@ -742,38 +776,53 @@ class _CoursesTabAdminState extends State<CoursesTabAdmin>
                   borderRadius: const BorderRadius.vertical(
                     top: Radius.circular(20),
                   ),
-                  child: course['thumbnail_url'] != null &&
-                          course['thumbnail_url'].toString().isNotEmpty
-                      ? Image.network(
-                          course['thumbnail_url'],
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: double.infinity,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            color: isDark ? Colors.grey[800] : Colors.grey[200],
-                            child: Icon(
-                              Icons.broken_image,
-                              color: isDark ? Colors.grey[600] : Colors.grey[400],
-                              size: 40,
+                  child:
+                      course['thumbnail_url'] != null &&
+                              course['thumbnail_url'].toString().isNotEmpty
+                          ? Image.network(
+                            course['thumbnail_url'],
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                            height: double.infinity,
+                            errorBuilder:
+                                (context, error, stackTrace) => Container(
+                                  color:
+                                      isDark
+                                          ? Colors.grey[800]
+                                          : Colors.grey[200],
+                                  child: Icon(
+                                    Icons.broken_image,
+                                    color:
+                                        isDark
+                                            ? Colors.grey[600]
+                                            : Colors.grey[400],
+                                    size: 40,
+                                  ),
+                                ),
+                          )
+                          : Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors:
+                                    isDark
+                                        ? [
+                                          const Color(0xFF2D3748),
+                                          const Color(0xFF4A5568),
+                                        ]
+                                        : [
+                                          colorScheme.primary,
+                                          const Color(0xFF4a5394),
+                                        ],
+                              ),
+                            ),
+                            child: const Center(
+                              child: Icon(
+                                Icons.school,
+                                color: Colors.white,
+                                size: 50,
+                              ),
                             ),
                           ),
-                        )
-                      : Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: isDark
-                                  ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
-                                  : [colorScheme.primary, const Color(0xFF4a5394)],
-                            ),
-                          ),
-                          child: const Center(
-                            child: Icon(
-                              Icons.school,
-                              color: Colors.white,
-                              size: 50,
-                            ),
-                          ),
-                        ),
                 ),
                 Positioned(
                   top: 8,
@@ -848,24 +897,25 @@ class _CoursesTabAdminState extends State<CoursesTabAdmin>
                     }
                   },
                   offset: const Offset(0, -80),
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'edit',
-                      child: ListTile(
-                        leading: Icon(Icons.edit, color: Colors.blue),
-                        title: Text('Edit'),
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                    ),
-                    const PopupMenuItem(
-                      value: 'delete',
-                      child: ListTile(
-                        leading: Icon(Icons.delete, color: Colors.red),
-                        title: Text('Delete'),
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                    ),
-                  ],
+                  itemBuilder:
+                      (context) => [
+                        const PopupMenuItem(
+                          value: 'edit',
+                          child: ListTile(
+                            leading: Icon(Icons.edit, color: Colors.blue),
+                            title: Text('Edit'),
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                        const PopupMenuItem(
+                          value: 'delete',
+                          child: ListTile(
+                            leading: Icon(Icons.delete, color: Colors.red),
+                            title: Text('Delete'),
+                            contentPadding: EdgeInsets.zero,
+                          ),
+                        ),
+                      ],
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 6),
@@ -900,123 +950,127 @@ class _CoursesTabAdminState extends State<CoursesTabAdmin>
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle bar
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: theme.textTheme.bodyMedium?.color,
-                borderRadius: BorderRadius.circular(2),
+      builder:
+          (context) => Container(
+            decoration: BoxDecoration(
+              color: colorScheme.surface,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
               ),
             ),
-            const SizedBox(height: 24),
-
-            // Warning icon
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(30),
-              ),
-              child: const Icon(
-                Icons.warning_rounded,
-                color: Colors.red,
-                size: 30,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Title
-            Text(
-              'Delete Course?',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 12),
-
-            // Content
-            Text(
-              'Are you sure you want to delete "${course['title']}"?\n\nThis action cannot be undone and will remove all associated topics.',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: theme.textTheme.bodyMedium?.color,
-                height: 1.5,
-              ),
-            ),
-            const SizedBox(height: 32),
-
-            // Buttons
-            Row(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Expanded(
-                  child: TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: theme.textTheme.bodyMedium?.color ?? Colors.grey),
-                      ),
-                    ),
-                    child: const Text(
-                      'Cancel',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                // Handle bar
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: theme.textTheme.bodyMedium?.color,
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      deleteCourse(course['id']);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 0,
-                    ),
-                    child: const Text(
-                      'Delete',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                const SizedBox(height: 24),
+
+                // Warning icon
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: const Icon(
+                    Icons.warning_rounded,
+                    color: Colors.red,
+                    size: 30,
                   ),
                 ),
+                const SizedBox(height: 16),
+
+                // Title
+                Text(
+                  'Delete Course?',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Content
+                Text(
+                  'Are you sure you want to delete "${course['title']}"?\n\nThis action cannot be undone and will remove all associated topics.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: theme.textTheme.bodyMedium?.color,
+                    height: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 32),
+
+                // Buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(
+                              color:
+                                  theme.textTheme.bodyMedium?.color ??
+                                  Colors.grey,
+                            ),
+                          ),
+                        ),
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          deleteCourse(course['id']);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: const Text(
+                          'Delete',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
               ],
             ),
-
-
-            SizedBox(height: MediaQuery.of(context).padding.bottom + 16),
-          ],
-        ),
-      ),
+          ),
     );
   }
 }
