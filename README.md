@@ -195,8 +195,9 @@ Need help? Don't hesitate to contact us:
 
 | Avatar | Name | Role |
 |--------|------|------|
-| ![Raafli](https://github.com/raaflii.png) | **Raafli** | Lead Developer |
-| | | |
+| ![Raafli](https://github.com/raaflii.png) | **Rafli** | Developer |
+| ![Mutiarn](https://github.com/mutiarn.png) | **Mutia** | Developer |
+| ![Nadzirarifqi](https://github.com/nadzirarifqi.png) | **Onet** | Developer |
 
 [⬆️ Back to Top](#-learnity-mobile)
 ---
