@@ -39,14 +39,18 @@ class _ProfileTabState extends State<ProfileTab> {
   @override
   Widget build(BuildContext context) {
     final user = Supabase.instance.client.auth.currentUser;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF7475d6), Color.fromARGB(255, 161, 161, 212)],
+            colors:[
+                    const Color(0xFF7475d6), // Keep original color for light mode
+                    const Color.fromARGB(255, 161, 161, 212),
+                  ]
           ),
         ),
         child: SafeArea(
@@ -62,7 +66,12 @@ class _ProfileTabState extends State<ProfileTab> {
                       height: 120,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 4),
+                        border: Border.all(
+                          color: isDark 
+                              ? Theme.of(context).colorScheme.outline
+                              : Colors.white, 
+                          width: 4
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withOpacity(0.2),
@@ -73,7 +82,7 @@ class _ProfileTabState extends State<ProfileTab> {
                       ),
                       child: CircleAvatar(
                         radius: 56,
-                        backgroundColor: Colors.white,
+                        backgroundColor: Theme.of(context).colorScheme.surface,
                         child: CircleAvatar(
                           radius: 52,
                           backgroundImage:
@@ -93,9 +102,9 @@ class _ProfileTabState extends State<ProfileTab> {
                                     (_username?.isNotEmpty ?? false)
                                         ? _username![0].toUpperCase()
                                         : 'U',
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 40,
-                                      color: Colors.grey,
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   )
@@ -107,10 +116,12 @@ class _ProfileTabState extends State<ProfileTab> {
                     const SizedBox(height: 16),
                     Text(
                       _username ?? 'Siswa',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: isDark 
+                            ? Theme.of(context).colorScheme.onSurface
+                            : Colors.white,
                       ),
                     ),
 
@@ -119,9 +130,11 @@ class _ProfileTabState extends State<ProfileTab> {
                     // Email
                     Text(
                       user?.email ?? 'example@example.com',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
-                        color: Colors.white70,
+                        color: isDark 
+                            ? Theme.of(context).colorScheme.onSurface.withOpacity(0.7)
+                            : Colors.white70,
                       ),
                     ),
                   ],
@@ -132,98 +145,101 @@ class _ProfileTabState extends State<ProfileTab> {
 
               Expanded(
                 child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(30),
                       topRight: Radius.circular(30),
                     ),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      children: [
-                        // Profile Menu Item
-                        _buildMenuItem(
-                          icon: Icons.person_outline,
-                          title: 'My Profile',
-                          onTap: () {},
-                        ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Profile Menu Item
+                          _buildMenuItem(
+                            icon: Icons.person_outline,
+                            title: 'My Profile',
+                            onTap: () {},
+                          ),
 
-                        const SizedBox(height: 16),
+                          const SizedBox(height: 16),
 
-                        // Messages Menu Item
-                        _buildMenuItem(
-                          icon: Icons.message_outlined,
-                          title: 'Messages',
-                          hasNotification: true,
-                          onTap: () {},
-                        ),
+                          // Messages Menu Item
+                          _buildMenuItem(
+                            icon: Icons.message_outlined,
+                            title: 'Messages',
+                            hasNotification: true,
+                            onTap: () {},
+                          ),
 
-                        const SizedBox(height: 16),
+                          const SizedBox(height: 16),
 
-                        // Favorites Menu Item
-                        _buildMenuItem(
-                          icon: Icons.favorite_outline,
-                          title: 'Favorites',
-                          onTap: () {},
-                        ),
+                          // Favorites Menu Item
+                          _buildMenuItem(
+                            icon: Icons.favorite_outline,
+                            title: 'Favorites',
+                            onTap: () {},
+                          ),
 
-                        const SizedBox(height: 16),
+                          const SizedBox(height: 16),
 
-                        // Location Menu Item
-                        _buildMenuItem(
-                          icon: Icons.location_on_outlined,
-                          title: 'Location',
-                          onTap: () {},
-                        ),
+                          // Location Menu Item
+                          _buildMenuItem(
+                            icon: Icons.location_on_outlined,
+                            title: 'Location',
+                            onTap: () {},
+                          ),
 
-                        const SizedBox(height: 16),
+                          const SizedBox(height: 16),
 
-                        _buildMenuItem(
-                          icon: Icons.settings_outlined,
-                          title: 'Settings',
-                          onTap: () {},
-                        ),
+                          _buildMenuItem(
+                            icon: Icons.settings_outlined,
+                            title: 'Settings',
+                            onTap: () {},
+                          ),
 
-                        const Spacer(),
+                          const SizedBox(height: 40),
 
-                        SizedBox(
-                          width: double.infinity,
-                          child: TextButton.icon(
-                            onPressed: () async {
-                              await Supabase.instance.client.auth.signOut();
-                              if (context.mounted) {
-                                await Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => LoginPage(),
-                                  ),
-                                );
-                              }
-                            },
-                            icon: const Icon(
-                              Icons.logout,
-                              color: Color(0xFFd32f2f),
-                            ),
-                            label: const Text(
-                              'Logout',
-                              style: TextStyle(
+                          SizedBox(
+                            width: double.infinity,
+                            child: TextButton.icon(
+                              onPressed: () async {
+                                await Supabase.instance.client.auth.signOut();
+                                if (context.mounted) {
+                                  await Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => LoginPage(),
+                                    ),
+                                  );
+                                }
+                              },
+                              icon: const Icon(
+                                Icons.logout,
                                 color: Color(0xFFd32f2f),
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
                               ),
-                            ),
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                              label: const Text(
+                                'Logout',
+                                style: TextStyle(
+                                  color: Color(0xFFd32f2f),
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                              foregroundColor: const Color(0xFFd32f2f),
+                              style: TextButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                foregroundColor: const Color(0xFFd32f2f),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -241,40 +257,64 @@ class _ProfileTabState extends State<ProfileTab> {
     required VoidCallback onTap,
     bool hasNotification = false,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         decoration: BoxDecoration(
-          color: Colors.grey.shade50,
+          color: isDark 
+              ? colorScheme.surfaceContainer
+              : Colors.white,
           borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isDark 
+                ? colorScheme.outline.withOpacity(0.2)
+                : Colors.grey.withOpacity(0.2),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: isDark 
+                  ? Colors.black.withOpacity(0.2)
+                  : Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark 
+                    ? colorScheme.primaryContainer.withOpacity(0.3)
+                    : colorScheme.primaryContainer.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.shade200,
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+                border: Border.all(
+                  color: colorScheme.primary.withOpacity(0.2),
+                  width: 1,
+                ),
               ),
-              child: Icon(icon, color: Colors.grey.shade700, size: 20),
+              child: Icon(
+                icon, 
+                color: colorScheme.primary, 
+                size: 20
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
-                  color: Colors.black87,
+                  color: colorScheme.onSurface,
                 ),
               ),
             ),
@@ -282,15 +322,15 @@ class _ProfileTabState extends State<ProfileTab> {
               Container(
                 width: 8,
                 height: 8,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF8B5CF6),
+                decoration: BoxDecoration(
+                  color: colorScheme.primary,
                   shape: BoxShape.circle,
                 ),
               ),
             const SizedBox(width: 8),
             Icon(
               Icons.arrow_forward_ios,
-              color: Colors.grey.shade400,
+              color: colorScheme.onSurfaceVariant,
               size: 16,
             ),
           ],

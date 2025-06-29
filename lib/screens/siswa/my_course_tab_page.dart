@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:mobile_edu/screens/siswa/course_detail_page.dart';
+import 'package:mobile_edu/screens/siswa/home_siswa.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class MyCourseTab extends StatefulWidget {
@@ -19,6 +20,7 @@ class _MyCourseTabState extends State<MyCourseTab>
   late Animation<double> _fadeAnimation;
   String _searchQuery = '';
   bool _isGridView = false;
+  final FocusNode _searchFocusNode = FocusNode();
 
   @override
   void initState() {
@@ -36,6 +38,7 @@ class _MyCourseTabState extends State<MyCourseTab>
   @override
   void dispose() {
     _animationController.dispose();
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -67,8 +70,12 @@ class _MyCourseTabState extends State<MyCourseTab>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.grey[50],
+      backgroundColor: colorScheme.background,
       body: CustomScrollView(
         slivers: [
           SliverAppBar(
@@ -85,14 +92,14 @@ class _MyCourseTabState extends State<MyCourseTab>
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      const Color(0xFF7475d6),
-                      const Color.fromARGB(255, 161, 161, 212),
+                      Color(0xFF7475d6),
+                      Color.fromARGB(255, 161, 161, 212),
                     ],
                   ),
                 ),
-                child: Stack(
+                child: const Stack(
                   children: [
-                    const Positioned(
+                    Positioned(
                       bottom: 30,
                       left: 24,
                       child: Column(
@@ -126,6 +133,7 @@ class _MyCourseTabState extends State<MyCourseTab>
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
+                  // Search Bar - Updated styling to match course_tab
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(15),
@@ -138,32 +146,50 @@ class _MyCourseTabState extends State<MyCourseTab>
                       ],
                     ),
                     child: TextField(
+                      focusNode: _searchFocusNode,
                       onChanged: (value) {
                         setState(() {
                           _searchQuery = value;
                         });
                       },
+                      style: TextStyle(color: colorScheme.onSurface),
                       decoration: InputDecoration(
-                        hintText: 'Cari kursus Anda...',
-                        prefixIcon: const Icon(
-                          Icons.search,
-                          color: Colors.grey,
+                        hintText: 'Search your courses...',
+                        hintStyle: TextStyle(
+                          color: theme.textTheme.bodyMedium?.color,
                         ),
+                        prefixIcon: Icon(
+                          Icons.search,
+                          color: theme.textTheme.bodyMedium?.color,
+                        ),
+                        suffixIcon:
+                            _searchQuery.isNotEmpty
+                                ? IconButton(
+                                  icon: Icon(
+                                    Icons.clear,
+                                    color: theme.textTheme.bodyMedium?.color,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _searchQuery = '';
+                                    });
+                                  },
+                                )
+                                : null,
                         filled: true,
-                        fillColor: Colors.white,
+                        fillColor: colorScheme.surface,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 20,
                           vertical: 15,
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
-                          borderSide:
-                              BorderSide.none, // hilangkan garis border default
+                          borderSide: BorderSide.none,
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(15),
                           borderSide: BorderSide(
-                            color: Color(0xFF667eea),
+                            color: colorScheme.primary,
                             width: 1,
                           ),
                         ),
@@ -171,21 +197,20 @@ class _MyCourseTabState extends State<MyCourseTab>
                     ),
                   ),
                   const SizedBox(height: 16),
-
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Kursus Terdaftar',
+                      Text(
+                        'Enrolled Courses',
                         style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: colorScheme.onBackground,
                         ),
                       ),
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: colorScheme.surface,
                           borderRadius: BorderRadius.circular(10),
                           boxShadow: [
                             BoxShadow(
@@ -207,8 +232,8 @@ class _MyCourseTabState extends State<MyCourseTab>
                                 Icons.view_list,
                                 color:
                                     !_isGridView
-                                        ? const Color(0xFF667eea)
-                                        : Colors.grey,
+                                        ? colorScheme.primary
+                                        : theme.textTheme.bodyMedium?.color,
                               ),
                             ),
                             IconButton(
@@ -221,8 +246,8 @@ class _MyCourseTabState extends State<MyCourseTab>
                                 Icons.grid_view,
                                 color:
                                     _isGridView
-                                        ? const Color(0xFF667eea)
-                                        : Colors.grey,
+                                        ? colorScheme.primary
+                                        : theme.textTheme.bodyMedium?.color,
                               ),
                             ),
                           ],
@@ -239,9 +264,13 @@ class _MyCourseTabState extends State<MyCourseTab>
               future: _enrolledCoursesFuture,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const SizedBox(
+                  return SizedBox(
                     height: 300,
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: colorScheme.primary,
+                      ),
+                    ),
                   );
                 }
                 if (snapshot.hasError) {
@@ -249,7 +278,8 @@ class _MyCourseTabState extends State<MyCourseTab>
                     height: 300,
                     margin: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.red[50],
+                      color:
+                          isDark ? Colors.red.withOpacity(0.1) : Colors.red[50],
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: Center(
@@ -287,9 +317,7 @@ class _MyCourseTabState extends State<MyCourseTab>
                 if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return _buildEmptyState();
                 }
-
                 final filteredCourses = _filterCourses(snapshot.data!);
-
                 if (filteredCourses.isEmpty) {
                   return Container(
                     height: 300,
@@ -301,14 +329,14 @@ class _MyCourseTabState extends State<MyCourseTab>
                           Icon(
                             Icons.search_off,
                             size: 60,
-                            color: Colors.grey[400],
+                            color: theme.textTheme.bodyMedium?.color,
                           ),
                           const SizedBox(height: 16),
                           Text(
                             'Tidak ada kursus yang ditemukan',
                             style: TextStyle(
                               fontSize: 18,
-                              color: Colors.grey[600],
+                              color: theme.textTheme.bodyMedium?.color,
                             ),
                           ),
                         ],
@@ -316,7 +344,6 @@ class _MyCourseTabState extends State<MyCourseTab>
                     ),
                   );
                 }
-
                 return FadeTransition(
                   opacity: _fadeAnimation,
                   child:
@@ -333,11 +360,15 @@ class _MyCourseTabState extends State<MyCourseTab>
   }
 
   Widget _buildEmptyState() {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Container(
       height: 400,
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -355,40 +386,47 @@ class _MyCourseTabState extends State<MyCourseTab>
               width: 120,
               height: 120,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                gradient: LinearGradient(
+                  colors:
+                      isDark
+                          ? [const Color(0xFF2D3748), const Color(0xFF4A5568)]
+                          : [colorScheme.primary, const Color(0xFF4a5394)],
                 ),
                 borderRadius: BorderRadius.circular(60),
               ),
-              child: const Icon(
-                Icons.school_outlined,
-                size: 60,
-                color: Colors.white,
-              ),
+              child: Icon(Icons.school_outlined, size: 60, color: Colors.white),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'Belum Ada Kursus',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87,
+                color: colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Anda belum terdaftar di kursus apapun.',
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+              style: TextStyle(
+                fontSize: 16,
+                color: theme.textTheme.bodyMedium?.color,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => HomeSiswa(initialIndex: 2)),
+                );
+              },
               icon: const Icon(Icons.explore),
               label: const Text('Jelajahi Kursus'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF667eea),
-                foregroundColor: Colors.white,
+                backgroundColor: colorScheme.primary,
+                foregroundColor: colorScheme.onPrimary,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24,
                   vertical: 12,
@@ -413,10 +451,8 @@ class _MyCourseTabState extends State<MyCourseTab>
       itemBuilder: (context, index) {
         final enrollment = enrollments[index];
         final course = enrollment['course'];
-        // Check if progress exists in database, otherwise use static progress
         final progress =
             enrollment['progress'] ?? _generateStaticProgress(course);
-
         return AnimatedContainer(
           duration: Duration(milliseconds: 300 + (index * 100)),
           margin: const EdgeInsets.only(bottom: 16),
@@ -434,7 +470,7 @@ class _MyCourseTabState extends State<MyCourseTab>
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          childAspectRatio: 0.57,
+          childAspectRatio: 0.55,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
         ),
@@ -442,10 +478,8 @@ class _MyCourseTabState extends State<MyCourseTab>
         itemBuilder: (context, index) {
           final enrollment = enrollments[index];
           final course = enrollment['course'];
-          // Check if progress exists in database, otherwise use static progress
           final progress =
               enrollment['progress'] ?? _generateStaticProgress(course);
-
           return AnimatedContainer(
             duration: Duration(milliseconds: 300 + (index * 100)),
             child: _buildCourseCard(course, progress, true),
@@ -460,6 +494,9 @@ class _MyCourseTabState extends State<MyCourseTab>
     int progress,
     bool isGrid,
   ) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -469,7 +506,7 @@ class _MyCourseTabState extends State<MyCourseTab>
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -488,6 +525,10 @@ class _MyCourseTabState extends State<MyCourseTab>
   }
 
   Widget _buildListCard(Map<String, dynamic> course, int progress) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return SizedBox(
       height: 195,
       child: Padding(
@@ -510,12 +551,16 @@ class _MyCourseTabState extends State<MyCourseTab>
                                 height: 80,
                                 width: 80,
                                 decoration: BoxDecoration(
-                                  color: Colors.grey[200],
+                                  color:
+                                      isDark
+                                          ? Colors.grey[800]
+                                          : Colors.grey[200],
                                   borderRadius: BorderRadius.circular(15),
                                 ),
-                                child: const Center(
+                                child: Center(
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
+                                    color: colorScheme.primary,
                                   ),
                                 ),
                               ),
@@ -524,12 +569,18 @@ class _MyCourseTabState extends State<MyCourseTab>
                                 height: 80,
                                 width: 80,
                                 decoration: BoxDecoration(
-                                  color: Colors.grey[200],
+                                  color:
+                                      isDark
+                                          ? Colors.grey[800]
+                                          : Colors.grey[200],
                                   borderRadius: BorderRadius.circular(15),
                                 ),
                                 child: Icon(
                                   Icons.broken_image,
-                                  color: Colors.grey[400],
+                                  color:
+                                      isDark
+                                          ? Colors.grey[600]
+                                          : Colors.grey[400],
                                 ),
                               ),
                         )
@@ -537,12 +588,21 @@ class _MyCourseTabState extends State<MyCourseTab>
                           height: 80,
                           width: 80,
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(
-                              colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                            gradient: LinearGradient(
+                              colors:
+                                  isDark
+                                      ? [
+                                        const Color(0xFF2D3748),
+                                        const Color(0xFF4A5568),
+                                      ]
+                                      : [
+                                        colorScheme.primary,
+                                        const Color(0xFF4a5394),
+                                      ],
                             ),
                             borderRadius: BorderRadius.circular(15),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.play_circle_outline,
                             color: Colors.white,
                             size: 40,
@@ -558,61 +618,48 @@ class _MyCourseTabState extends State<MyCourseTab>
                 children: [
                   Text(
                     course['title'] ?? 'No Title',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: colorScheme.onSurface,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
                   Text(
                     course['description'] ?? 'No description available.',
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: theme.textTheme.bodyMedium?.color,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 8),
                   Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Colors.green[50],
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          'Rp ${_formatPrice(course['price'] ?? '0')}',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.green[700],
+                      Expanded(
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: LinearProgressIndicator(
+                            value: progress / 100,
+                            backgroundColor: Colors.grey[200],
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              colorScheme.primary,
+                            ),
+                            minHeight: 5,
                           ),
                         ),
                       ),
-                      const Spacer(),
+                      const SizedBox(width: 12), // jarak antar elemen
                       Text(
                         '$progress%',
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blue[700],
+                          color: colorScheme.primary,
                         ),
                       ),
                     ],
-                  ),
-                  const SizedBox(height: 8),
-                  LinearProgressIndicator(
-                    value: progress / 100,
-                    backgroundColor: Colors.grey[200],
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      Colors.blue[600]!,
-                    ),
-                    minHeight: 4,
                   ),
                 ],
               ),
@@ -621,12 +668,12 @@ class _MyCourseTabState extends State<MyCourseTab>
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: const Color(0xFF667eea).withOpacity(0.1),
+                color: colorScheme.primary.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.arrow_forward_ios,
-                color: Color(0xFF667eea),
+                color: colorScheme.primary,
                 size: 16,
               ),
             ),
@@ -637,6 +684,10 @@ class _MyCourseTabState extends State<MyCourseTab>
   }
 
   Widget _buildGridCard(Map<String, dynamic> course, int progress) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -658,30 +709,45 @@ class _MyCourseTabState extends State<MyCourseTab>
                         fit: BoxFit.cover,
                         placeholder:
                             (context, url) => Container(
-                              color: Colors.grey[200],
-                              child: const Center(
+                              color:
+                                  isDark ? Colors.grey[800] : Colors.grey[200],
+                              child: Center(
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
+                                  color: colorScheme.primary,
                                 ),
                               ),
                             ),
                         errorWidget:
                             (context, url, error) => Container(
-                              color: Colors.grey[200],
+                              color:
+                                  isDark ? Colors.grey[800] : Colors.grey[200],
                               child: Icon(
                                 Icons.broken_image,
-                                color: Colors.grey[400],
+                                color:
+                                    isDark
+                                        ? Colors.grey[600]
+                                        : Colors.grey[400],
                                 size: 40,
                               ),
                             ),
                       )
                       : Container(
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+                            colors:
+                                isDark
+                                    ? [
+                                      const Color(0xFF2D3748),
+                                      const Color(0xFF4A5568),
+                                    ]
+                                    : [
+                                      colorScheme.primary,
+                                      const Color(0xFF4a5394),
+                                    ],
                           ),
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Icon(
                             Icons.play_circle_outline,
                             color: Colors.white,
@@ -701,23 +767,15 @@ class _MyCourseTabState extends State<MyCourseTab>
               children: [
                 Text(
                   course['title'] ?? 'No Title',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: colorScheme.onSurface,
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  'Rp ${_formatPrice(course['price'] ?? '0')}',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green[700],
-                  ),
-                ),
+                const SizedBox(height: 8),
                 const Spacer(),
                 Column(
                   children: [
@@ -728,7 +786,7 @@ class _MyCourseTabState extends State<MyCourseTab>
                           'Progress',
                           style: TextStyle(
                             fontSize: 10,
-                            color: Colors.grey[600],
+                            color: theme.textTheme.bodyMedium?.color,
                           ),
                         ),
                         Text(
@@ -736,7 +794,7 @@ class _MyCourseTabState extends State<MyCourseTab>
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
-                            color: Colors.blue[700],
+                            color: colorScheme.primary,
                           ),
                         ),
                       ],
@@ -746,7 +804,7 @@ class _MyCourseTabState extends State<MyCourseTab>
                       value: progress / 100,
                       backgroundColor: Colors.grey[200],
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        Colors.blue[600]!,
+                        colorScheme.primary,
                       ),
                       minHeight: 3,
                     ),
@@ -763,12 +821,10 @@ class _MyCourseTabState extends State<MyCourseTab>
 
 String _formatPrice(dynamic price) {
   if (price == null) return '0,00';
-
   final formatter = NumberFormat.currency(
     locale: 'id_ID',
-    symbol: '', // Tidak pakai Rp di sini, bisa kamu tambahkan di UI kalau perlu
+    symbol: '',
     decimalDigits: 2,
   );
-
   return formatter.format(price).trim();
 }

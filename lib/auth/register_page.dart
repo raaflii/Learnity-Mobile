@@ -23,7 +23,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Future<void> register() async {
     final email = emailCtrl.text.trim();
     final password = passCtrl.text.trim();
-    final username = usernameCtrl.text.trim(); 
+    final username = usernameCtrl.text.trim();
     final fullName = fullNameCtrl.text.trim();
 
     if (email.isEmpty ||
