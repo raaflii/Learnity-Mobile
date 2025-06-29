@@ -46,25 +46,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
               },
               children: [
                 _buildWelcomePage(
-                  // illustration: _buildTrackingIllustration(),
                   title: "Track Your Progress",
                   description:
                       "Monitor your learning journey and\nearn certificates as you advance",
                 ),
                 _buildWelcomePage(
-                  // illustration: _buildLearningIllustration(),
                   title: "Interactive Learning",
                   description:
                       "Engage with hands-on projects\nand practical exercises",
                 ),
                 _buildWelcomePage(
-                  // illustration: _buildCommunityIllustration(),
                   title: "Learn Together",
                   description:
                       "Connect with expert instructors\nand fellow learners",
                 ),
                 _buildWelcomePage(
-                  // illustration: _buildSuccessIllustration(),
                   title: "Start Your Journey",
                   description:
                       "Unlock endless learning opportunities\nand achieve your goals",
@@ -139,19 +135,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     required String description,
     bool isLastPage = false,
   }) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 32.0),
       child: Column(
         children: [
           const SizedBox(height: 200),
-
           // Title
           Text(
             title,
             style: TextStyle(
               fontSize: 32,
               fontWeight: FontWeight.bold,
-              color: Colors.grey.shade800,
+              color: colorScheme.onSurface,
               height: 1.2,
             ),
             textAlign: TextAlign.center,
